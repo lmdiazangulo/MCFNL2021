@@ -2,8 +2,8 @@
     "format": "pyfdtd1d",
     
     "options": {
-        "finalTime": 20e-9,
-        "cfl": 0.95
+        "finalTime": 500e-9,
+        "cfl": 1.0
     },
 
     "coordinates": [
@@ -19,7 +19,7 @@
 
     "grid": {   
         "elemId": 0,
-        "steps": 0.025,
+        "steps": 0.005,
         "bounds": ["pec", "pec"]
     },
 
@@ -29,8 +29,8 @@
             "direction": [0.0, 0.0, 1.0],
             "magnitude": {
                 "type": "gaussian",
-                "gaussianDelay": 10e-9,
-                "gaussianSpread": 2e-9
+                "gaussianDelay":  100e-9,
+                "gaussianSpread":  25e-9
             },
             "elemId": 1
         }

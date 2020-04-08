@@ -7,16 +7,16 @@ import time
 L = 0 # Lower
 U = 1 # Upper
 
+class Fields: 
+    def __init__(self, e, h):
+        self.e = e
+        self.h = h
+    
+    def get(self):
+        return (self.e, self.h)
+
 class Solver:
     
-    class Fields: 
-        def __init__(self, e, h):
-            self.e = e
-            self.h = h
-        
-        def get(self):
-            return (self.e, self.h)
-
     __timeStepPrint = 100
 
     def __init__(self, mesh, options, probes, sources):
@@ -33,7 +33,7 @@ class Solver:
             p["mesh"] = {"origin": box[L], "steps": abs(box[U]-box[L]) / Nx}
             p["indices"] = ids
             p["time"]   = [0.0]
-            p["values"] = [np.zeros(Nx)]
+            p["values"] = [np.zeros((1,Nx[1]))]
 
         self._sources = copy.deepcopy(sources)
         for source in self._sources:
@@ -41,8 +41,8 @@ class Solver:
             ids = mesh.toIds(box)
             source["index"] = ids
 
-        self.old = self.Fields(e = np.zeros( mesh.pos.size ),
-                               h = np.zeros( mesh.pos.size-1 ) )
+        self.old = Fields(e = np.zeros( mesh.pos.size ),
+                          h = np.zeros( mesh.pos.size-1 ) )
 
     def solve(self, dimensionalFinalTime):
         tic = time.time()
@@ -52,7 +52,7 @@ class Solver:
             int(dimensionalFinalTime * sp.speed_of_light / dt)
         for n in range(numberOfTimeSteps):
         
-            self._updateE(t, dt, self.old)
+            self._updateE(t, dt)
             t += dt/2.0
 
             self._updateH(t, dt)
@@ -80,11 +80,9 @@ class Solver:
         res = self._probes
         return res
 
-    # ======================= UPDATE E =============================
-    def _updateE(self, t, dt, overFields = None):
+    def _updateE(self, t, dt):
         (e, h) = self.old.get()
         eNew = np.zeros( self.old.e.shape )
-        
         eNew[1:-1] = e[1:-1] + dt * (h[1:] - h[:-1])
         
         # Boundary conditions
@@ -94,13 +92,6 @@ class Solver:
                 eNew[-1] = 0.0
             else:
                 raise ValueError("Unrecognized boundary type")
-        
-    # ======================= UPDATE H =============================
-    def _updateH(self, t, dt):      
-        hNew = np.zeros( self.old.h.shape )
-        (e, h) = self.old.get()
-        
-        hNew[:] = h[:] + dt * (e[1:] - e[:-1])
 
         # Source terms
         for source in self._sources:
@@ -110,13 +101,19 @@ class Solver:
                     delay  = sp.speed_of_light * magnitude["gaussianDelay"]
                     spread = sp.speed_of_light * magnitude["gaussianSpread"]
                     id = source["index"]
-                    e[id] += Solver._gaussian(t, delay, spread) * dt
+                    eNew[id] += Solver._gaussian(t, delay, spread) * dt
                 else:
                     raise ValueError(\
                     "Invalid source magnitude type: " + magnitude["type"])
             else:
                 raise ValueError("Invalid source type: " + source["type"])
 
+        e[:] = eNew[:]
+        
+    def _updateH(self, t, dt):      
+        hNew = np.zeros( self.old.h.shape )
+        (e, h) = self.old.get()
+        hNew[:] = h[:] + dt * (e[1:] - e[:-1])
         h[:] = hNew[:]
             
     def _updateProbes(self, t):
