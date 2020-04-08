@@ -20,17 +20,9 @@ def Gaussian(t,x,A,sig,c):
         Computes Gaussian function
     
     '''
-    f=A*np.exp(-((x-c*t)/(sig*np.sqrt(2)))**2)
-    plt.plot()
-    return f
-
-def PlotMovie(t,x,A,sig,c) :
-    f=Gaussian(t,x,A,sig,c)
-    ax.clear()
-    graf=ax.plot(x,f)
-    return graf
+    return A*np.exp(-((x-c*t)/(sig*np.sqrt(2)))**2)
     
-tEnd=10
+tEnd=100
 xEnd=100
 c=1
 A=1
@@ -39,17 +31,25 @@ sig=1
 t=np.linspace(0,tEnd,50)
 x=np.linspace(0,xEnd,5000)
 
-#%% Plot
-# Graphic 
-fig,ax=plt.subplots(figsize=(12,7))
-ax.set_xlabel("x")
+fig = plt.figure(figsize=(8,4))
+ax1 = fig.add_subplot(1, 2, 1)
+ax1 = plt.axes(xlim=(x[0], x[-1]), ylim=(-1.1, 1.1))
+line1,    = ax1.plot([], [], 'o', markersize=1)
+timeText1 = ax1.text(0.02, 0.95, '', transform=ax1.transAxes)
 
-# Movie properties
-Writer = animation.writers['ffmpeg']
-writer = Writer(fps=60, metadata=dict(artist='Me'), bitrate=1,codec="libx264")
+def init():
+    line1.set_data([], [])
+    timeText1.set_text('')
+    return line1, timeText1
 
-# Play movie
-peli=animation.FuncAnimation(fig,PlotMovie,fargs=(x,A,sig,c),frames=t,interval=30,repeat=True)
+def animate(i):
+    line1.set_data(x, Gaussian(t[i], x, A, sig, c))
+    timeText1.set_text('Time = %2.1f' % (t[i]))
+    return line1, timeText1
 
+anim = animation.FuncAnimation(fig, animate, init_func=init,
+                               frames=len(t), interval=50, blit=True)
+
+plt.show()
 
 
