@@ -2,7 +2,7 @@
     "format": "pyfdtd1d",
     
     "options": {
-        "finalTime": 500e-9,
+        "finalTime": 20e-9,
         "cfl": 1.0
     },
 
@@ -19,7 +19,7 @@
 
     "grid": {   
         "elemId": 0,
-        "steps": 0.005,
+        "steps": 0.025,
         "bounds": ["pec", "pec"]
     },
 
@@ -29,8 +29,8 @@
             "direction": [0.0, 0.0, 1.0],
             "magnitude": {
                 "type": "gaussian",
-                "gaussianDelay":  100e-9,
-                "gaussianSpread":  25e-9
+                "gaussianDelay":  1.25e-9,
+                "gaussianSpread": 0.25e-9
             },
             "elemId": 1
         }
@@ -39,7 +39,8 @@
     "probes": [
         {
             "name": "s1",
-            "elemId": 0
+            "elemId": 0,
+            "__samplingPeriod": 0.1e-9
         }
     ]
 }

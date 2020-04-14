@@ -30,6 +30,6 @@ print('--- Solving')
 solver.solve(data["options"]["finalTime"])
 
 print('--- Visualizing')
-Animator(mesh, solver.getProbes()[0], skipFrames=200)
+Animator(mesh, solver.getProbes()[0])
 
 print('=== Program finished')

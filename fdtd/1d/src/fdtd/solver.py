@@ -17,7 +17,7 @@ class Fields:
 
 class Solver:
     
-    __timeStepPrint = 100
+    _timeStepPrint = 100
 
     def __init__(self, mesh, options, probes, sources):
         self.options = options
@@ -44,23 +44,19 @@ class Solver:
         self.old = Fields(e = np.zeros( mesh.pos.size ),
                           h = np.zeros( mesh.pos.size-1 ) )
 
-    def solve(self, dimensionalFinalTime):
+    def solve(self, finalTime):
         tic = time.time()
         t = 0.0
         dt = self._dt()
-        numberOfTimeSteps = \
-            int(dimensionalFinalTime * sp.speed_of_light / dt)
+        numberOfTimeSteps = int(finalTime / dt)
         for n in range(numberOfTimeSteps):
-        
             self._updateE(t, dt)
             t += dt/2.0
-
             self._updateH(t, dt)
             t += dt/2.0
-
             self._updateProbes(t)
     
-            if n % self.__timeStepPrint == 0 or n+1 == numberOfTimeSteps:
+            if n % self._timeStepPrint == 0 or n+1 == numberOfTimeSteps:
                 remaining = (time.time() - tic) * \
                     (numberOfTimeSteps-n) / (n+1)
                 min = math.floor(remaining / 60.0)
@@ -71,10 +67,10 @@ class Solver:
         print("    CPU Time: %f [s]" % (time.time() - tic))
 
     def _dt(self):
-        return self.options["cfl"] * self._mesh.steps() / math.sqrt(2.0)  
+        return self.options["cfl"] * self._mesh.steps() / sp.speed_of_light  
 
     def timeStep(self):
-        return self._dt() / sp.speed_of_light
+        return self._dt()
 
     def getProbes(self):
         res = self._probes
@@ -83,7 +79,8 @@ class Solver:
     def _updateE(self, t, dt):
         (e, h) = self.old.get()
         eNew = np.zeros( self.old.e.shape )
-        eNew[1:-1] = e[1:-1] + dt * (h[1:] - h[:-1])
+        cE = dt / sp.epsilon_0 / self._mesh.steps()
+        eNew[1:-1] = e[1:-1] + cE * (h[1:] - h[:-1])
         
         # Boundary conditions
         for bound in self._mesh.bounds:
@@ -98,10 +95,9 @@ class Solver:
             if source["type"] == "dipole":
                 magnitude = source["magnitude"]
                 if magnitude["type"] == "gaussian":
-                    delay  = sp.speed_of_light * magnitude["gaussianDelay"]
-                    spread = sp.speed_of_light * magnitude["gaussianSpread"]
-                    id = source["index"]
-                    eNew[id] += Solver._gaussian(t, delay, spread) * dt
+                    eNew[source["index"]] += Solver._gaussian(t, \
+                        magnitude["gaussianDelay"], \
+                        magnitude["gaussianSpread"] ) 
                 else:
                     raise ValueError(\
                     "Invalid source magnitude type: " + magnitude["type"])
@@ -113,17 +109,16 @@ class Solver:
     def _updateH(self, t, dt):      
         hNew = np.zeros( self.old.h.shape )
         (e, h) = self.old.get()
-        hNew[:] = h[:] + dt * (e[1:] - e[:-1])
+        cH = dt / sp.mu_0 / self._mesh.steps()
+        hNew[:] = h[:] + cH * (e[1:] - e[:-1])
         h[:] = hNew[:]
             
     def _updateProbes(self, t):
         for p in self._probes:
-            dimensionalTime = t/sp.speed_of_light
-            writeStep = "samplingPeriod" in p \
-                and (dimensionalTime/p["samplingPeriod"] >= len(p["time"]))
-            writeStep = writeStep or "samplingPeriod" not in p
-            if writeStep:
-                p["time"].append(dimensionalTime)
+            if "samplingPeriod" not in p or \
+               "samplingPeriod" in p and \
+               (t/p["samplingPeriod"] >= len(p["time"])):
+                p["time"].append(t)
                 ids = p["indices"]
                 values = np.zeros(ids[U]-ids[L])
                 values[:] = self.old.e[ ids[0]:ids[1] ]

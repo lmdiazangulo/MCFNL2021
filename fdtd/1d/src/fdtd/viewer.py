@@ -3,22 +3,22 @@ import matplotlib.animation as animation
 
 class Animator:
 
-    def __init__(self, mesh, probe, skipFrames = 1):
+    def __init__(self, mesh, probe):
         
         ids = probe["indices"]
         gridE = mesh.pos[ids[0]:ids[1]]
 
-        probeTime = probe["time"][::skipFrames]
-        values    = probe["values"][::skipFrames]
+        probeTime = probe["time"][:]
+        values    = probe["values"][:]
 
 
         fig = plt.figure(figsize=(8,4))
-        ax1 = fig.add_subplot(1, 2, 1)
+        ax1 = fig.add_subplot(1, 1, 1)
         ax1 = plt.axes(xlim=(gridE[0], gridE[-1]), ylim=(-1.1, 1.1))
         ax1.grid(color='gray', linestyle='--', linewidth=.2)
         ax1.set_xlabel('X coordinate [m]')
         ax1.set_ylabel('Field')
-        line1,    = ax1.plot([], [], '-', markersize=1)
+        line1,    = ax1.plot([], [], '.', markersize=1)
         timeText1 = ax1.text(0.02, 0.95, '', transform=ax1.transAxes)
 
         def init():
