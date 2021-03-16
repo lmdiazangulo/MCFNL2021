@@ -7,6 +7,8 @@ import matplotlib.pyplot as plt
 from scipy import optimize
 
 
+
+
 s0=10e-6
 t0=10*s0
 def gaussian(x,mu,sig):
