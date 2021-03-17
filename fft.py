@@ -5,7 +5,7 @@ import math
 import matplotlib.mlab as mlab
 import matplotlib.pyplot as plt
 from scipy import optimize
-
+from scipy.fft import fft, fftfreq
 
 
 
@@ -21,8 +21,19 @@ plt.ylabel('g(t) ')
 plt.xlabel('t')
 plt.title('Funcion Gaussiana')
 plt.xlim(0,200e-6)
-freq = np.fft.fftfreq(t.shape[-1])
-gft=np.fft.fft(gaussian(t,t0,s0))
+#---- transformada de Fourier-------
+
+# Number of sample points
+N = 1001
+
+# sample spacing
+
+T = 500e-6 / 1001.0
+
+freq = fftfreq(N, T)[:N]
+
+gft= fft(gaussian(t,t0,s0))
+
 plt.subplot(1, 2, 2)
 plt.plot(freq,abs(gft),color='r')
 plt.grid(color='k', linestyle='--', linewidth=0.5)
