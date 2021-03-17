@@ -35,8 +35,9 @@ freq = fftfreq(N, T)[:N]
 gft= fft(gaussian(t,t0,s0))
 
 plt.subplot(1, 2, 2)
-plt.plot(freq,abs(gft),color='r')
+plt.plot(freq,np.absolute(gft),color='r')
 plt.grid(color='k', linestyle='--', linewidth=0.5)
+plt.title('Dominio frecuencia')
 plt.ylabel('G(w) ')
 plt.xlabel('w')
 plt.show()
