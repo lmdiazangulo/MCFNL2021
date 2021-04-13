@@ -83,10 +83,25 @@ class Solver:
         eNew[1:-1] = e[1:-1] + cE * (h[1:] - h[:-1])
         
         # Boundary conditions
-        for bound in self._mesh.bounds:
+        for b in range(len(self._mesh.bounds)):
+            bound = self._mesh.bounds[b]
+            if b == 0:
+                ind = 0
+            else:
+                ind = -1
             if bound == "pec":
-                eNew[ 0] = 0.0
-                eNew[-1] = 0.0
+                eNew[ind] = 0.0
+            elif bound == "pmc":
+                if ind == 0:
+                    eNew[ind] = e[ind] + cE * 2.0 * h[ind]
+                elif ind == -1:
+                    eNew[ind] = e[ind] - cE * 2.0 * h[ind]
+            elif bound == "mur":
+                c0 = sp.speed_of_light
+                dx = self._mesh.steps()
+                if ind == 0:
+                    eNew[0] = e[1] + \
+                       (c0 * dt - dx)/(c0 * dt + dx)  * (eNew[1]-e[0]) 
             else:
                 raise ValueError("Unrecognized boundary type")
 
@@ -114,20 +129,20 @@ class Solver:
         hNew[:] = h[:] + cH * (e[1:] - e[:-1])
 
         # # Source terms
-        # for source in self._sources:
-        #     if source["type"] == "dipole":
-        #         magnitude = source["magnitude"]
-        #         if magnitude["type"] == "gaussian":
-        #             hNew[source["index"]-1] -= Solver._gaussian(t-dt/2, \
-        #                 magnitude["gaussianDelay"], \
-        #                 magnitude["gaussianSpread"] ) * \
-        #                     dt / self._mesh.steps() * sp.speed_of_light / \
-        #                         np.sqrt(sp.mu_0 / sp.epsilon_0)
-        #         else:
-        #             raise ValueError(\
-        #             "Invalid source magnitude type: " + magnitude["type"])
-        #     else:
-        #         raise ValueError("Invalid source type: " + source["type"])
+        for source in self._sources:
+            if source["type"] == "dipole":
+                magnitude = source["magnitude"]
+                if magnitude["type"] == "gaussian":
+                    hNew[source["index"]-1] -= Solver._gaussian(t-dt/2, \
+                        magnitude["gaussianDelay"], \
+                        magnitude["gaussianSpread"] ) * \
+                            dt / self._mesh.steps() * sp.speed_of_light / \
+                                np.sqrt(sp.mu_0 / sp.epsilon_0)
+                else:
+                    raise ValueError(\
+                    "Invalid source magnitude type: " + magnitude["type"])
+            else:
+                raise ValueError("Invalid source type: " + source["type"])
 
         h[:] = hNew[:]
             
