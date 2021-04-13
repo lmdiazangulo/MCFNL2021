@@ -19,7 +19,7 @@
 
     "grid": {   
         "elemId": 0,
-        "steps": 0.025,
+        "steps": 0.005,
         "bounds": ["pec", "pec"]
     },
 

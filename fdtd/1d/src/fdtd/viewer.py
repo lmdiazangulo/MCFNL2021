@@ -31,7 +31,7 @@ class Animator:
                 timeText1.set_text('Time = %2.1f [ns]' % (probeTime[i]*1e9))
                 return line1, timeText1
 
-        animation.FuncAnimation(fig, animate, init_func=init,
-            frames=len(probeTime), blit=True)
+        _ = animation.FuncAnimation(fig, animate, init_func=init,
+            frames=len(probeTime), interval=10, blit=True)
 
         plt.show()

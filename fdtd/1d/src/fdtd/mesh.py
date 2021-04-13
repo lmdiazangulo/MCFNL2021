@@ -18,7 +18,7 @@ class Mesh:
 
         Lx = abs(box[U] - box[L])
         dx = grid["steps"]
-        self.pos =  np.linspace(box[L], box[U], num=Lx/dx+1, endpoint=True)
+        self.pos =  np.linspace(box[L], box[U], num=int(Lx/dx)+1, endpoint=True)
         self.bounds = grid["bounds"]
 
     def steps(self):

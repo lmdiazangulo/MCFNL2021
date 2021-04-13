@@ -97,7 +97,8 @@ class Solver:
                 if magnitude["type"] == "gaussian":
                     eNew[source["index"]] += Solver._gaussian(t, \
                         magnitude["gaussianDelay"], \
-                        magnitude["gaussianSpread"] ) 
+                        magnitude["gaussianSpread"] ) * \
+                            dt / self._mesh.steps() * sp.speed_of_light
                 else:
                     raise ValueError(\
                     "Invalid source magnitude type: " + magnitude["type"])
@@ -111,6 +112,23 @@ class Solver:
         (e, h) = self.old.get()
         cH = dt / sp.mu_0 / self._mesh.steps()
         hNew[:] = h[:] + cH * (e[1:] - e[:-1])
+
+        # # Source terms
+        # for source in self._sources:
+        #     if source["type"] == "dipole":
+        #         magnitude = source["magnitude"]
+        #         if magnitude["type"] == "gaussian":
+        #             hNew[source["index"]-1] -= Solver._gaussian(t-dt/2, \
+        #                 magnitude["gaussianDelay"], \
+        #                 magnitude["gaussianSpread"] ) * \
+        #                     dt / self._mesh.steps() * sp.speed_of_light / \
+        #                         np.sqrt(sp.mu_0 / sp.epsilon_0)
+        #         else:
+        #             raise ValueError(\
+        #             "Invalid source magnitude type: " + magnitude["type"])
+        #     else:
+        #         raise ValueError("Invalid source type: " + source["type"])
+
         h[:] = hNew[:]
             
     def _updateProbes(self, t):
