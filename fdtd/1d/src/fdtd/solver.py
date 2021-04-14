@@ -102,6 +102,9 @@ class Solver:
                 if ind == 0:
                     eNew[0] = e[1] + \
                        (c0 * dt - dx)/(c0 * dt + dx)  * (eNew[1]-e[0]) 
+                elif ind == -1:
+                    eNew[ind] = e[ind-1] + \
+                       (c0 * dt - dx)/(c0 * dt + dx)  * (eNew[ind-1]-e[ind])
             else:
                 raise ValueError("Unrecognized boundary type")
 
@@ -129,20 +132,20 @@ class Solver:
         hNew[:] = h[:] + cH * (e[1:] - e[:-1])
 
         # # Source terms
-        for source in self._sources:
-            if source["type"] == "dipole":
-                magnitude = source["magnitude"]
-                if magnitude["type"] == "gaussian":
-                    hNew[source["index"]-1] -= Solver._gaussian(t-dt/2, \
-                        magnitude["gaussianDelay"], \
-                        magnitude["gaussianSpread"] ) * \
-                            dt / self._mesh.steps() * sp.speed_of_light / \
-                                np.sqrt(sp.mu_0 / sp.epsilon_0)
-                else:
-                    raise ValueError(\
-                    "Invalid source magnitude type: " + magnitude["type"])
-            else:
-                raise ValueError("Invalid source type: " + source["type"])
+        # for source in self._sources:
+        #     if source["type"] == "dipole":
+        #         magnitude = source["magnitude"]
+        #         if magnitude["type"] == "gaussian":
+        #             hNew[source["index"]-1] -= Solver._gaussian(t-dt/2, \
+        #                 magnitude["gaussianDelay"], \
+        #                 magnitude["gaussianSpread"] ) * \
+        #                     dt / self._mesh.steps() * sp.speed_of_light / \
+        #                         np.sqrt(sp.mu_0 / sp.epsilon_0)
+        #         else:
+        #             raise ValueError(\
+        #             "Invalid source magnitude type: " + magnitude["type"])
+        #     else:
+        #         raise ValueError("Invalid source type: " + source["type"])
 
         h[:] = hNew[:]
             
