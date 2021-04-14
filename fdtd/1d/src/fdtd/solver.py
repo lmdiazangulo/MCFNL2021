@@ -102,6 +102,9 @@ class Solver:
                 if ind == 0:
                     eNew[0] = e[1] + \
                        (c0 * dt - dx)/(c0 * dt + dx)  * (eNew[1]-e[0]) 
+                elif ind == -1:
+                    eNew[ind] = e[ind-1] + \
+                       (c0 * dt - dx)/(c0 * dt + dx)  * (eNew[ind-1]-e[ind])
             else:
                 raise ValueError("Unrecognized boundary type")
 
