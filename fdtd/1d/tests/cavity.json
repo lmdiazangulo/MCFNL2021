@@ -1,0 +1,46 @@
+{
+    "format": "pyfdtd1d",
+    
+    "options": {
+        "finalTime": 20e-9,
+        "cfl": 1.0
+    },
+
+    "coordinates": [
+        0.0,
+        1.0,
+        0.5
+    ],
+
+    "elements": [
+        [0, 1],
+        [2, 2]
+    ],
+
+    "grid": {   
+        "elemId": 0,
+        "steps": 0.025,
+        "bounds": ["pec", "pec"]
+    },
+
+    "sources": [
+        {
+            "type": "dipole", 
+            "direction": [0.0, 0.0, 1.0],
+            "magnitude": {
+                "type": "gaussian",
+                "gaussianDelay":  1.25e-9,
+                "gaussianSpread": 0.25e-9
+            },
+            "elemId": 1
+        }
+    ],
+ 
+    "probes": [
+        {
+            "name": "s1",
+            "elemId": 0,
+            "__samplingPeriod": 0.1e-9
+        }
+    ]
+}
