@@ -1,0 +1,75 @@
+{
+    "format": "pyfdtd1d",
+    
+    "options": {
+        "finalTime": 10e-9,
+        "cfl": 1
+    },
+
+    "medio": {
+        "epsinf": 4.3,
+        "condc": 0.106
+    },
+
+    "cp": [
+        [0.5987, 4195],
+        [-0.2211,0.2680],
+        [-4.240,732.4],
+        [0.6391,-0.07186],
+        [1.806,4.563],
+        [1.443,-8.219]
+    ],
+
+    "ap": [
+        [-0.02502,-0.008626],
+        [-0.2021,-0.9407],
+        [-14.67,-1.338],
+        [-0.2997,-4.034],
+        [-1.896,-4.808],
+        [-9.396,-6.477]
+    ],
+
+    "coordinates": [
+        0.0,
+        1.0,
+        0.5
+    ],
+
+    "elements": [
+        [0, 1],
+        [2, 2]
+    ],
+
+    "grid": {   
+        "elemId": 0,
+        "steps": 0.005,
+        "bounds": ["pec", "pec"]
+    },
+
+    "sources": [
+        {
+            "type": "dipole", 
+            "direction": [0.0, 0.0, 1.0],
+            "magnitude": {
+                "type": "gaussian",
+                "gaussianDelay":  1.25e-9,
+                "gaussianSpread": 0.25e-9
+            },
+            "elemId": 1
+        }
+    ],
+    
+    "InitialPulse": {
+        "Amp": 10,
+        "Mean": 0.5,
+        "Std": 0.1
+    },
+
+    "probes": [
+        {
+            "name": "s1",
+            "elemId": 0,
+            "__samplingPeriod": 0.1e-9
+        }
+    ]
+}
