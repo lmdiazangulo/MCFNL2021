@@ -34,6 +34,7 @@ class Solver:
             p["indices"] = ids
             p["time"]   = [0.0]
             p["values"] = [np.zeros((1,Nx[1]))]
+            p["valuesh"] = [np.zeros((1,Nx[1]))]
 
         self._sources = copy.deepcopy(sources)
         for source in self._sources:
@@ -131,21 +132,21 @@ class Solver:
         cH = dt / sp.mu_0 / self._mesh.steps()
         hNew[:] = h[:] + cH * (e[1:] - e[:-1])
 
-        # # Source terms
-        # for source in self._sources:
-        #     if source["type"] == "dipole":
-        #         magnitude = source["magnitude"]
-        #         if magnitude["type"] == "gaussian":
-        #             hNew[source["index"]-1] -= Solver._gaussian(t-dt/2, \
-        #                 magnitude["gaussianDelay"], \
-        #                 magnitude["gaussianSpread"] ) * \
-        #                     dt / self._mesh.steps() * sp.speed_of_light / \
-        #                         np.sqrt(sp.mu_0 / sp.epsilon_0)
-        #         else:
-        #             raise ValueError(\
-        #             "Invalid source magnitude type: " + magnitude["type"])
-        #     else:
-        #         raise ValueError("Invalid source type: " + source["type"])
+        # Source terms
+        for source in self._sources:
+            if source["type"] == "dipole":
+                magnitude = source["magnitude"]
+                if magnitude["type"] == "gaussian":
+                    hNew[source["index"]-1 ] -= Solver._gaussian((t-dt/2), \
+                        magnitude["gaussianDelay"], \
+                        magnitude["gaussianSpread"] ) * \
+                            dt / self._mesh.steps() * sp.speed_of_light / \
+                                np.sqrt(sp.mu_0 / sp.epsilon_0)
+                else:
+                    raise ValueError(\
+                    "Invalid source magnitude type: " + magnitude["type"])
+            else:
+                raise ValueError("Invalid source type: " + source["type"])
 
         h[:] = hNew[:]
             
@@ -158,7 +159,10 @@ class Solver:
                 ids = p["indices"]
                 values = np.zeros(ids[U]-ids[L])
                 values[:] = self.old.e[ ids[0]:ids[1] ]
+                valuesh = np.zeros(ids[U]-ids[L])
+                valuesh[:] = self.old.h[ ids[0]:ids[1] ]
                 p["values"].append(values)
+                p["valuesh"].append(valuesh)
 
     @staticmethod
     def _gaussian(x, delay, spread):
