@@ -284,11 +284,7 @@ class Solver:
                         yHz = np.tile(yHz, (NxHz, 1))
                         hNew[id[L][X]:id[U][X], id[L][Y]:id[U][Y]] += \
                          TMn_Hz(t, xHz, yHz, n, intens, freq, mu, epsilon, lon_y) \
-<<<<<<< HEAD
                          * gaussian(t, delay, spread)
-=======
-                         * gaussian(t, delay, spread) # * np.sqrt(sp.mu_0/sp.epsilon_0)
->>>>>>> 71f8005357c2aa2ba1b31db9f1187c163e14246a
 
                     elif magnitude["type"] == "TMstep":
                         id = source["index"]
