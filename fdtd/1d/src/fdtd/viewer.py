@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
+import numpy as np
 
 class Animator:
 
@@ -9,7 +10,8 @@ class Animator:
         gridE = mesh.pos[ids[0]:ids[1]]
 
         probeTime = probe["time"][:]
-        values    = probe["values"][:]
+        # values = probe["values"][:]
+        values = np.array(list(map(lambda x: x*10**2, probe["valuesh"][:])))
 
 
         fig = plt.figure(figsize=(8,4))
